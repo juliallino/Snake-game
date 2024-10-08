@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+    import { getAuth } from "firebase/auth";
+    const firebaseConfig = {
+      apiKey: "AIzaSyC_GhOmHxZyQ-v-U9Dyb-PDGRX_JikFrLE",
+      authDomain: "snakegame-b64d3.firebaseapp.com",
+      projectId: "snakegame-b64d3",
+      storageBucket: "snakegame-b64d3.appspot.com",
+      messagingSenderId: "464765344464",
+      appId: "1:464765344464:web:d01a6546522486324e9cd5"
+    };
+    var firebase = require('firebase');
+    var firebaseui = require('firebaseui');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+  </script>
+
+<html>
+<head>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+    <title>Snake Game - Login</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #login-container {
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0;
+        }
+
+        .input-container input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #login-container .login-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #login-container .register-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #game-container {
+            display: none;
+        }
+
+        #gameCanvas {
+            border: 1px solid #000;
+        }
+
+        #start-game-button {
+            width: 100px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        #pause-game-button {
+            width: 100px;
+            padding: 10px;
+            background-color: #F00;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #ranking-button {
+            width: 100px;
+            padding: 10px;
+            background-color: #FFA500;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #cadastro-button {
+            width: 100px;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <img style="position: absolute; top: 0; left: 4;" src="https://minhabiblioteca.com.br/wp-content/uploads/2019/01/UNIFOR.png" alt="UNIFOR" width="80" height="90"> 
+    <div id="login-container">
+        <img src="https://s2-techtudo.glbimg.com/19fbcSZWLLXCmTfflUgF761lquI=/0x0:1612x844/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_08fbf48bc0524877943fe86e43087e7a/internal_photos/bs/2022/g/U/S2lWVDRc2ejDUfnidF1Q/captura-de-tela-2022-03-24-as-16.15.09.png" alt="W3Schools.com" width="250" height="142">
+        <h2>Login</h2>
+        <div class="input-container">
+            <input type="text" id="username" placeholder="Usuário">
+        </div>
+        <div class="input-container">
+            <input type="password" id="senha" placeholder="Senha">
+        </div>
+        <button class="login-button" onclick="startGame()">Login</button>
+        <button class="register-button" onclick="redirectToRegistration()">Registrar</button>
+    </div>
+    <div id="game-container">
+        <button id="start-game-button" onclick="initGame()">Começar o Jogo</button>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div id="score">Score: 0</div>
+        <div id="phase">Fase 1</div>
+        <button id="pause-game-button" onclick="pauseGame()">Pausar</button>
+        <button id="ranking-button" onclick="redirectToRanking()">Ranking</button>
+        <button id="cadastro-button" onclick="redirectToRegistration()">Cadastro</button>
+    </div>
+    <script>
+        const loginContainer = document.getElementById("login-container");
+        const gameContainer = document.getElementById("game-container");
+        let gameStarted = false;
+        let gamePaused = false;
+        let currentPhase = 1;
+        let speed = 130;
+
+        function startGame() {
+    const username = document.getElementById("username").value;
+    const senha = document.getElementById("senha").value; 
+    
+    if (username && senha) {
+        loginContainer.style.display = "none";
+        gameContainer.style.display = "block";
+
+     
+        
+        if (autenticarUsuario(username, senha)) {
+            gameStarted = true;
+            speed = 100; 
+            initGame();
+        } else {
+            alert("Usuário ou senha incorretos. Por favor, tente novamente.");
+            loginContainer.style.display = "block";
+            gameContainer.style.display = "none";
+        }
+    }
+}
+
+function updateSpeed() {
+    
+    if (score >= 50) {
+        speed = 100;
+    }
+    if (score >= 100) {
+        speed = 70;
+    }
+    if (score >= 150) {
+        speed = 50;
+    }
+    if (score >= 200) {
+        speed = 30;
+    }
+   
+}
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const gridSize = 20;
+        const gridWidth = canvas.width / gridSize;
+        const gridHeight = canvas.height / gridSize;
+
+        let snake = [{ x: 10, y: 10 }];
+        let direction = "right";
+        let food = { x: 15, y: 15 };
+        let score = 0;
+
+        function drawSnake() {
+            snake.forEach(segment => {
+                ctx.fillStyle = "#00F";
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+            });
+        }
+
+        function drawFood() {
+            ctx.fillStyle = "#F00";
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+        }
+
+        function moveSnake() {
+            if (gamePaused) return;
+
+            let headX = snake[0].x;
+            let headY = snake[0].y;
+
+            if (direction === "right") headX++;
+            if (direction === "left") headX--;
+            if (direction === "up") headY--;
+            if (direction === "down") headY++;
+
+            snake.unshift({ x: headX, y: headY });
+
+            if (headX === food.x && headY === food.y) {
+                food = {
+                    x: Math.floor(Math.random() * gridWidth),
+                    y: Math.floor(Math.random() * gridHeight),
+                };
+                score += 10;
+                updateScore();
+            } else {
+                snake.pop();
+            }
+            
+            
+            if (score >= currentPhase * 100) {
+                currentPhase++;
+                document.getElementById("phase").innerText = `Fase ${currentPhase}`;
+            }
+        }
+
+        function checkCollision() {
+            if (gamePaused) return false;
+
+            const headX = snake[0].x;
+            const headY = snake[0].y;
+
+            if (headX < 0 || headX >= gridWidth || headY < 0 || headY >= gridHeight) {
+                return true; 
+            }
+
+            for (let i = 1; i < snake.length; i++) {
+                if (headX === snake[i].x && headY === snake[i].y) {
+                    return true; 
+                }
+            }
+
+            return false;
+        }
+
+        function updateScore() {
+            const scoreElement = document.getElementById("score");
+            scoreElement.innerText = "Score: " + score;
+        }
+
+        function initGame() {
+            if (!gameStarted) {
+                gameStarted = true;
+                const gameButton = document.getElementById("start-game-button");
+                gameButton.style.display = "none";
+
+                const loginContainer = document.getElementById("login-container");
+                loginContainer.style.display = "none";
+
+                const canvas = document.getElementById("gameCanvas");
+                canvas.focus();
+
+                let speed = 100 - (currentPhase - 1) * 10;
+                gameLoop(speed);
+            }
+        }
+
+        function pauseGame() {
+            gamePaused = !gamePaused;
+        }
+
+        function redirectToRanking() {
+            window.location.href = "file:///C:/Users/Alan/Desktop/Arquivos%20virtual%20studio/ranking.html"; 
+        }
+
+        function redirectToRegistration() {
+            window.location.href = "file:///C:/Users/Alan/Desktop/Arquivos%20virtual%20studio/cadastro.html"; 
+        }
+
+        function gameLoop() {
+    if (checkCollision()) {
+        alert("Game Over! Score: " + score);
+
+        gameStarted = false;
+        gamePaused = false;
+        currentPhase = 1;
+        document.getElementById("phase").innerText = `Fase ${currentPhase}`;
+        document.getElementById("start-game-button").style.display = "block";
+        resetGame();
+        return;
+    }
+
+    if (!gamePaused) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawSnake();
+        drawFood();
+        moveSnake();
+        updateSpeed();
+        updateScore();
+    }
+
+    setTimeout(() => gameLoop(), speed); 
+}
+
+        function resetGame() {
+            snake = [{ x: 10, y: 10 }];
+            direction = "right";
+            food = { x: 15, y: 15 };
+            score = 0;
+        }
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "ArrowUp" && direction !== "down") direction = "up";
+            if (event.key === "ArrowDown" && direction !== "up") direction = "down";
+            if (event.key === "ArrowLeft" && direction !== "right") direction = "left";
+            if (event.key === "ArrowRight" && direction !== "left") direction = "right";
+        });
+    </script>
+</body>
+</html>
